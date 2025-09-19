@@ -1,6 +1,6 @@
 # ADR 0002: Use the Outbox Pattern for Integration Events
 
-- Status: Accepted
+- Status: Proposed
 - Date: 2025-09-18
 - Deciders: Architecture Labs
 - Tags: outbox, reliability, idempotency, integration-events

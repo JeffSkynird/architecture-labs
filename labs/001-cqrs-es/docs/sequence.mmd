@@ -7,10 +7,20 @@ sequenceDiagram
   participant P as Projector
   participant R as Read DB
 
-  C->>API: POST /orders { items, payment }
-  API->>H: validate+build Command
-  H->>ES: append(OrderCreated, PaymentRequested)
-  Note over H: Outbox: IntegrationEvent(PaymentRequested)
+  C->>API: POST /orders { items, client_request_id, payment? }
+  API->>H: validate & build CreateOrder command
+  H->>ES: stream(client_request_id)
+  alt duplicate request
+    H-->>API: reuse existing orderId
+  else new order
+    H->>ES: append(OrderCreated)
+    opt payment requested
+      H->>ES: append(PaymentRequested)
+      Note over H: Outbox dispatch (ADR-0002 Proposed)
+    end
+    H-->>API: new orderId
+  end
+  API-->>C: 200/201 { orderId }
 
   P-->>ES: subscribe(stream)
   ES-->>P: event(OrderCreated)
