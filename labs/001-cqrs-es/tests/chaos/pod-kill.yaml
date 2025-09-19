@@ -1,0 +1,13 @@
+# Example chaos manifest (Kubernetes): kill one pod of the projector
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: kill-projector
+spec:
+  action: pod-kill
+  mode: one
+  selector:
+    namespaces: ["default"]
+    labelSelectors:
+      app: order-projector
+  duration: "30s"
