@@ -1,0 +1,21 @@
+# ADR <number>: <Decision Title>
+
+- Status: Proposed | Accepted | Deprecated
+- Date: <YYYY-MM-DD>
+- Context
+  - Business context and constraints
+  - Non-Functional Requirements (NFRs): latency, RPS, RTO/RPO, cost, compliance
+- Decision
+  - What is decided and the scope
+- Alternatives
+  - Option A (pros/cons)
+  - Option B (pros/cons)
+  - Option C (pros/cons)
+- Consequences (Trade-offs)
+  - Positive
+  - Negative
+- Validation
+  - Experiments/benchmarks
+  - Rollout/canary plan
+- Links
+  - RFCs, diagrams, PRs

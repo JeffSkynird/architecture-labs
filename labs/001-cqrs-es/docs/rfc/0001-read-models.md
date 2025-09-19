@@ -1,0 +1,56 @@
+# RFC: Read Models for Order Service
+
+- Owner: Architecture Labs
+- Status: Accepted
+- Date: 2025-09-18
+- Summary
+  - Deliver low-latency, query-optimized views built from the event store via a projector process.
+  - Support local development with SQLite while paving a path to managed Postgres in production.
+- Problem Statement
+  - Directly querying the append-only event stream is too slow for client reads and complicates reporting.
+  - Consumers need consistent representations of orders (status, totals, payment state) without replaying events.
+- Requirements / NFRs
+  - Read p95 < 200 ms at 300–500 RPS.
+  - Projector lag p95 < 5 seconds with automatic catch-up on restarts.
+  - Deterministic rebuild from events; projector runs idempotently.
+  - Support pagination/filtering for future list views without full-table scans.
+- Architecture Overview (C4)
+  - Order API writes events to the append-only store.
+  - Projector subscribes to the event stream, transforms events, and upserts projections in the Read DB.
+  - Read clients query the Read DB through the Order API (`GET /orders/:id`).
+  - Outbox emits integration events in parallel; consumers rely on read models for state comprehension.
+- Data Model
+  - Primary projection: `OrderView` keyed by `order_id`.
+  - Columns: `order_id`, `customer_id`, `status`, `items_json`, `total_amount`, `currency`, `version`, `updated_at`.
+  - Store items as JSON to avoid over-normalizing in the projector; add indexes on `order_id` and `status`.
+  - Maintain projector checkpoints (offset/created_at) to resume processing.
+- APIs / Contracts
+  - `GET /orders/:id` returns the `OrderView` representation (200) or 404 if not materialized.
+  - `POST /orders` triggers event emission (`OrderCreated`, `PaymentRequested`) that drives projection updates.
+  - Future aggregate endpoints (list/search) must reuse projections or create specialized read tables.
+  - Events must remain backward-compatible; projector versioning is tied to event schema evolution.
+- Failure Modes & Resiliency
+  - Projector crash → restart from last checkpoint; monitor `projector_event_lag_seconds`.
+  - Event store corruption → rebuild from backup snapshot, replay events to regenerate projections.
+  - Long-running migrations → run projector in catch-up mode before opening traffic; throttle writes if lag exceeds SLO.
+  - Outbox dispatch delays → ensure projections tolerate eventual consistency; expose record version/lag in responses.
+- Security & Compliance (Threat model summary)
+  - Protect PII in projections with encryption at rest (Postgres) and filesystem permissions (SQLite).
+  - Enforce least-privilege DB credentials for projector and API.
+  - Validate input to prevent tampering; audit event signatures for traceability.
+- Observability (metrics/traces/logs)
+  - Metrics: `http_server_request_duration_seconds`, `http_requests_total`, `projector_event_lag_seconds`, projector processed events/sec.
+  - Logs: projector checkpoint progress, error classifications, DB write outcomes.
+  - Traces: span for `POST /orders` through command handling and event append; optional span for projector processing batches.
+  - Dashboards/alerts align with SLO definitions (burn-rate alerts on availability/latency and projector lag).
+- Cost Considerations
+  - SQLite (dev) incurs negligible cost; Postgres (prod) sized for read-heavy workload (~500 RPS) with read replicas optional later.
+  - Event store growth impacts replay time; budget for periodic snapshotting/compaction work.
+  - Projector scaling via horizontal workers increases compute cost; start with single instance.
+- Rollout Plan and Backout Strategy
+  - Phase 1: backfill projections by replaying existing events in staging; validate latency against SLO targets.
+  - Phase 2: enable projector in production in shadow mode, compare responses vs legacy read path (if any).
+  - Phase 3: switch read traffic to projections, monitor burn-rate alerts.
+  - Backout: disable projector, revert API reads to fallback (direct event replay or cached legacy view), delete partial projections.
+- Open Questions
+  - Do we need multi-tenant isolation in the read store for future labs?

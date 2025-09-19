@@ -1,0 +1,15 @@
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+
+# Node/k6
+node_modules/
+package-lock.json
+
+# Java, Rust
+target/
+
+# PHP
+vendor/
