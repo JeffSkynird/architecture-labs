@@ -13,3 +13,5 @@ target/
 
 # PHP
 vendor/
+
+dist/
