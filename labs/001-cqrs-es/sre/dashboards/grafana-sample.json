@@ -1,0 +1,17 @@
+{
+  "title": "Order Service (Sample)",
+  "panels": [
+    {
+      "type": "graph",
+      "title": "RPS (write/read)"
+    },
+    {
+      "type": "graph",
+      "title": "Latency p95 (ms)"
+    },
+    {
+      "type": "graph",
+      "title": "Error rate (%)"
+    }
+  ]
+}

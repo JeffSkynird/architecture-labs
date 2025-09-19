@@ -1,0 +1,29 @@
+name: Labs CI
+
+on:
+  push:
+    paths: ['labs/**', 'templates/**', 'infra/**', 'tests/**']
+  pull_request:
+    paths: ['labs/**', 'templates/**', 'infra/**', 'tests/**']
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Validate (per lab)
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          for path in labs/*/infra/terraform; do
+            echo "Validating Terraform in $path"
+            (cd "$path" && terraform init -backend=false && terraform validate)
+          done
+
+      - name: List Mermaid files
+        run: |
+          echo "Mermaid files:" && find . -name "*.mmd" -print || true

@@ -1,0 +1,10 @@
+groups:
+- name: order-slo
+  rules:
+  - alert: HighErrorBudgetBurn
+    expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.02
+    for: 10m
+    labels:
+      severity: page
+    annotations:
+      summary: High error budget burn detected
