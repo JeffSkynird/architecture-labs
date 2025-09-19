@@ -34,3 +34,4 @@ Adopt **CQRS** (segregated write/read paths) and **Event Sourcing** (append-only
 - C4 (Context/Container)
 - RFC 0001 (Read Models)
 - ADR 0002 (Outbox), ADR 0003 (Projections Store)
+- Implementation: labs/001-cqrs-es/app/node/src/infrastructure/eventstore/file-event-store.ts
