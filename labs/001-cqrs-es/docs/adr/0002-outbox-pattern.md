@@ -1,6 +1,6 @@
 # ADR 0002: Use the Outbox Pattern for Integration Events
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2025-09-18
 - Deciders: Architecture Labs
 - Tags: outbox, reliability, idempotency, integration-events
@@ -10,8 +10,8 @@ When persisting domain events (e.g., `OrderCreated`), we must also publish **int
 
 ## Decision
 Implement the **Outbox Pattern**:
-- In the same transaction as domain event append, write an **outbox** record.
-- A background **dispatcher** pulls outbox entries, publishes to the broker (simulated in the lab), retries with backoff, and marks as sent idempotently.
+- In the same transaction as domain event append, write an **outbox** record to `data/outbox.sqlite`.
+- A background **dispatcher** polls the outbox, retries with exponential backoff, and publishes integration events to RabbitMQ (`orders.integration-events`, persistent delivery) before idempotently marking rows as sent.
 
 ## Alternatives
 - **Direct publish** post-commit: risks lost messages during crashes.
@@ -34,4 +34,4 @@ Implement the **Outbox Pattern**:
 ## Links
 - ADR 0001 (CQRS+ES)
 - RFC 0001 (Read Models)
-- Runbook (Outbox stuck)
+- Runbook — "Outbox stuck queue" mitigations
