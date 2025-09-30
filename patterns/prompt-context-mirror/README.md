@@ -119,6 +119,6 @@ CONTEXT:\nUser=${userId}, Plan=${plan}, Route=${ui.route}\nSelection=${selection
 * 🧱 **LLM QA testing** (replay identical state and intent for deterministic outputs)
 
 ## Folder Structure
-* [`example/client.tsx`](./example/client.tsx): React + hash sync.
-* [`example/server.ts`](./example/server.ts): Fastify + in-memory versioned store.
+* [`example/client`](./example/client): React + hash sync.
+* [`example/server`](./example/server): Fastify + in-memory versioned store.
 * [`context.json`](./context.json): example snapshot.
