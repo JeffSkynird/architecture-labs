@@ -1,0 +1,7 @@
+{
+  "meta": { "contextId": "00000000-0000-4000-8000-000000000000", "version": 3, "hash": "<sha256>", "ts": "2025-09-29T00:00:00.000Z", "userId": "u123" },
+  "user": { "plan": "pro", "locale": "en-US" },
+  "doc": { "id": "d456", "title": "Contract A", "section": "4.2" },
+  "selection": { "text": "Clause 4.2..." },
+  "ui": { "route": "/docs/contract-a", "filters": { "risk": "high" } }
+}
