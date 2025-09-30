@@ -93,6 +93,7 @@ export type ContextSnapshot = {
 * Cache in Redis and persist in Postgres (JSONB) for audit trail.
 
 ## Prompt Builder Example
+[`context.json`](./context.json): example snapshot.
 ```txt
 SYSTEM: You are an assistant helping the user with document ${doc.title}.
 USER: ${intent}
@@ -118,7 +119,7 @@ CONTEXT:\nUser=${userId}, Plan=${plan}, Route=${ui.route}\nSelection=${selection
 * 🎓 **Learning platforms** (context-based tutoring or feedback)
 * 🧱 **LLM QA testing** (replay identical state and intent for deterministic outputs)
 
-## Folder Structure
-* [`example/client.tsx`](./example/client.tsx): React + hash sync.
-* [`example/server.ts`](./example/server.ts): Fastify + in-memory versioned store.
-* [`context.json`](./context.json): example snapshot.
+## Example
+* [`example/`](./example/README.md): Start here
+* `example/client`: React + hash sync.
+* `example/server`: Fastify + in-memory
